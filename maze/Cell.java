@@ -19,6 +19,8 @@ public class Cell {
 	 */
 	public int c;
 	
+	public boolean visited = false;
+	
 	/**
 	 * wall[i] is the wall on direction i of the cell
 	 */
