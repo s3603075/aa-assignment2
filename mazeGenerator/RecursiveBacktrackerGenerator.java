@@ -31,14 +31,18 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 		int randR = ThreadLocalRandom.current().nextInt(0, maze.sizeR);
 		
 		//Starting cell
-		Cell startCell = maze.map[randC][randR];
+		Cell startCell = maze.map[5][5];
+
+		System.out.println(randC + "," + randR);
 		
-		/**IN PROGRESS - DFS for normal**/
+		/**TODO - DFS for tunnel**/
 		switch(maze.type)	{
 			case Maze.NORMAL:
 				getUnvisited(startCell, dirSetN);
+				break;
 			case Maze.HEX:
 				getUnvisited(startCell, dirSetX);
+				break;
 		}
 		
 	} // end of generateMaze()
@@ -48,16 +52,17 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 		Cell neighCell;
 		
 		//Set cell to visited, add to stack
-		c.visited = true;
-		dfsStack.push(c);
 		
 		Collections.shuffle(Arrays.asList(dirSet));
 		
 		for(int i = 0; i < dirSet.length; i++)	{
 			//Find if neighbours are visited
-			neighCell = c.neigh[dirSet[i]]; 
+			neighCell = c.neigh[dirSet[i]];
 			if(neighCell != null) {
 				if(neighCell.visited == false)	{
+					c.visited = true;
+					neighCell.visited = true;
+					dfsStack.push(c);
 					//Disable wall
 					c.wall[dirSet[i]].present = false;
 					//Return current cell to function
@@ -66,7 +71,7 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 			}
 		}
 		
-		if(dfsStack.peek() != null) {
+		if(!dfsStack.isEmpty()) {
 			return backtrack(dfsStack.pop(), dirSet);
 		}
 		
@@ -77,18 +82,18 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 	public Cell backtrack(Cell c, Integer[] dirSet) {
 		
 		Cell neighCell;
-
+		
 		for(int i = 0; i < dirSet.length; i++)	{
 			//Find if neighbours are visited
 			neighCell = c.neigh[dirSet[i]];
 			if(neighCell != null) {
 				if(neighCell.visited == false)	{
-					return getUnvisited(neighCell, dirSet);
+					return getUnvisited(c, dirSet);
 				}
 			}
 		}
 		
-		if(dfsStack.peek() != null) {
+		if(!dfsStack.isEmpty()) {
 			return backtrack(dfsStack.pop(), dirSet);
 		}
 		
