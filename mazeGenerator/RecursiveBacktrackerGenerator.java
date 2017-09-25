@@ -24,7 +24,6 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 	
 	@Override
 	public void generateMaze(Maze maze) {
-		//TODO adjust for different maze type
 		
 		//Pick a random starting cell
 		int randC = ThreadLocalRandom.current().nextInt(0, maze.sizeC);
@@ -64,7 +63,7 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 					dfsStack.push(c);
 					//Disable wall
 					c.wall[dirSet[i]].present = false;
-					//Return current cell to function
+					//Return neighbour cell to function
 					return getUnvisited(neighCell, dirSet);
 				}
 			}
