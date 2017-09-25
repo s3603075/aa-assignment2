@@ -2,6 +2,8 @@ package mazeGenerator;
 
 import java.util.Collections;
 import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
@@ -19,7 +21,7 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 	
 	//Stack for backtracking
 	Deque<Cell> dfsStack = new ArrayDeque<Cell>();
-
+	
 	@Override
 	public void generateMaze(Maze maze) {
 		//TODO adjust for different maze type
@@ -32,61 +34,65 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 		Cell startCell = maze.map[randC][randR];
 		
 		/**IN PROGRESS - DFS for normal**/
-		getUnvisited(startCell);
+		switch(maze.type)	{
+			case Maze.NORMAL:
+				getUnvisited(startCell, dirSetN);
+			case Maze.HEX:
+				getUnvisited(startCell, dirSetX);
+		}
 		
 	} // end of generateMaze()
 	
-	public Cell getUnvisited(Cell c)	{
+	public Cell getUnvisited(Cell c, Integer[] dirSet)	{
 		
-		Cell neighCell = null;
+		Cell neighCell;
 		
-		Collections.shuffle(Arrays.asList(dirSetN));
+		//Set cell to visited, add to stack
+		c.visited = true;
+		dfsStack.push(c);
 		
-		for(int i = 0; i < dirSetN.length; i++)	{
+		Collections.shuffle(Arrays.asList(dirSet));
+		
+		for(int i = 0; i < dirSet.length; i++)	{
 			//Find if neighbours are visited
-			neighCell = c.neigh[dirSetN[i]]; 
+			neighCell = c.neigh[dirSet[i]]; 
 			if(neighCell != null) {
 				if(neighCell.visited == false)	{
-					//Set prev cell to visited, add to stack
-					c.visited = true;
-					dfsStack.push(c);
-					//Disable wall of start and current
-					c.wall[dirSetN[i]].present = false;
-					neighCell.wall[Maze.oppoDir[dirSetN[i]]].present = false;
+					//Disable wall
+					c.wall[dirSet[i]].present = false;
 					//Return current cell to function
-					return getUnvisited(neighCell);
+					return getUnvisited(neighCell, dirSet);
 				}
 			}
 		}
 		
 		if(dfsStack.peek() != null) {
-			return backtrack(dfsStack.pop());
+			return backtrack(dfsStack.pop(), dirSet);
 		}
 		
 		return null;
 		
 	}
 	
-	public Cell backtrack(Cell c) {
+	public Cell backtrack(Cell c, Integer[] dirSet) {
 		
-		Cell neighCell = null;
+		Cell neighCell;
 
-		for(int i = 0; i < dirSetN.length; i++)	{
+		for(int i = 0; i < dirSet.length; i++)	{
 			//Find if neighbours are visited
-			neighCell = c.neigh[dirSetN[i]];
+			neighCell = c.neigh[dirSet[i]];
 			if(neighCell != null) {
 				if(neighCell.visited == false)	{
-					return getUnvisited(neighCell);
+					return getUnvisited(neighCell, dirSet);
 				}
 			}
 		}
 		
 		if(dfsStack.peek() != null) {
-			return backtrack(dfsStack.pop());
+			return backtrack(dfsStack.pop(), dirSet);
 		}
 		
 		return null;
-		
 		
 	}
 
