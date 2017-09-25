@@ -30,18 +30,17 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 		int randC = ThreadLocalRandom.current().nextInt(0, maze.sizeC);
 		int randR = ThreadLocalRandom.current().nextInt(0, maze.sizeR);
 		
-		//Starting cell
-		Cell startCell = maze.map[5][5];
-
-		System.out.println(randC + "," + randR);
-		
 		/**TODO - DFS for tunnel**/
 		switch(maze.type)	{
 			case Maze.NORMAL:
+				//Starting cell for normal
+				Cell startCell = maze.map[randR][randC];
 				getUnvisited(startCell, dirSetN);
 				break;
 			case Maze.HEX:
-				getUnvisited(startCell, dirSetX);
+				//Starting cell for hex
+				Cell startCellHex = maze.map[randR][randC + (randR + 1) / 2];
+				getUnvisited(startCellHex, dirSetX);
 				break;
 		}
 		
@@ -50,9 +49,7 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 	public Cell getUnvisited(Cell c, Integer[] dirSet)	{
 		
 		Cell neighCell;
-		
-		//Set cell to visited, add to stack
-		
+	
 		Collections.shuffle(Arrays.asList(dirSet));
 		
 		for(int i = 0; i < dirSet.length; i++)	{
@@ -60,8 +57,10 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 			neighCell = c.neigh[dirSet[i]];
 			if(neighCell != null) {
 				if(neighCell.visited == false)	{
+					//Mark cells as visited
 					c.visited = true;
 					neighCell.visited = true;
+					//Push to stack
 					dfsStack.push(c);
 					//Disable wall
 					c.wall[dirSet[i]].present = false;
