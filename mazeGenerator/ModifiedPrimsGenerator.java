@@ -68,9 +68,16 @@ public class ModifiedPrimsGenerator implements MazeGenerator {
 	// they should be the same
 	private Boolean checkIfComplete(Maze maze){
 
-		if(setZ.size() != (maze.sizeC * maze.sizeR)){
-			return false;
+		if(maze.type == Maze.NORMAL){
+			if(setZ.size() != (maze.sizeC * maze.sizeR)){
+				return false;
+			}
+		}else if(maze.type == Maze.HEX){
+			if(setZ.size() != (maze.sizeC * (maze.sizeR + 1)/2)){
+				return false;
+			}
 		}
+		
 		return true;
 	}
 	
