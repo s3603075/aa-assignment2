@@ -64,17 +64,12 @@ public class ModifiedPrimsGenerator implements MazeGenerator {
 	} // end of generateMaze()
 	
 	
-	// Checking if Z contains every cell, if so then we're done.
-	// Probably faster way by comparing size; it's messy with different map types
+	// If Z is the same size as the number of Cells in the Map,
+	// they should be the same
 	private Boolean checkIfComplete(Maze maze){
-		
-		// Most straightforward comparison
-		for(int i=0; i<maze.sizeC; i++){
-			for(int j=0; j<maze.sizeR; j++){
-				if(setZ.contains(maze.map[j][i]) == false){
-					return false;
-				}
-			}
+
+		if(setZ.size() != (maze.sizeC * maze.sizeR)){
+			return false;
 		}
 		return true;
 	}
