@@ -54,6 +54,7 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 		//Check if cell has a tunnel. If so, add to stack and teleport to other cell.
 		if(c.tunnelTo != null && c.tunnelTo.visited == false)	{
 			c.visited = true;
+			c.tunnelTo.visited = true;
 			dfsStack.push(c);
 			return getUnvisited(c.tunnelTo, dirSet);
 		}
