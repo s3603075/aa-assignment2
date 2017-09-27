@@ -2,8 +2,6 @@ package mazeGenerator;
 
 import java.util.Collections;
 import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
@@ -11,16 +9,39 @@ import java.util.concurrent.ThreadLocalRandom;
 import maze.Cell;
 import maze.Maze;
 
+
+/**
+ * Uses Recursive Backtracking to generate a maze from a map.
+ * 
+ * @author Danny Ho
+ */
+
+
 public class RecursiveBacktrackerGenerator implements MazeGenerator {
 	
-	//Array for set of directions (normal and tunnel)
+	// Array for set of valid directions (normal and tunnel mazes).
 	Integer dirSetN[] = {Maze.EAST,Maze.NORTH,Maze.WEST,Maze.SOUTH};
 	
-	//Array for set of directions (hex)
+	// Array for set of valid directions (hex maze).
 	Integer dirSetX[] = {Maze.EAST, Maze.NORTHEAST,Maze.NORTHWEST,Maze.WEST,Maze.SOUTHWEST, Maze.SOUTHEAST};
 	
-	//Stack for backtracking
+	// Stack for backtracking to previous cells.
 	Deque<Cell> dfsStack = new ArrayDeque<Cell>();
+	
+	
+	
+	/**
+	 * Transform input maze into a perfect maze using recursive backtracking.
+	 * 
+	 * **********************************************************************
+	 * ALGORITHM Recursive Backtrack(Maze)
+	 * Perform a recursive backtrack to create a path between cells in a maze.
+	 * INPUT: Maze maze.
+	 * OUTPUT: None.
+	 * 
+	 * @param maze Input Maze. 
+	 */
+	
 	
 	@Override
 	public void generateMaze(Maze maze) {
@@ -46,8 +67,9 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 		}
 		
 	} // end of generateMaze()
+
 	
-	public Cell getUnvisited(Cell c, Integer[] dirSet)	{
+	private Cell getUnvisited(Cell c, Integer[] dirSet)	{
 		
 		Cell neighCell;
 		
@@ -59,28 +81,29 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 			return getUnvisited(c.tunnelTo, dirSet);
 		}
 		
-		//Randomise set of directions
+		// Randomise set of directions.
 		Collections.shuffle(Arrays.asList(dirSet));
 		
 		for(int i = 0; i < dirSet.length; i++)	{
-			//Find if neighbours are visited
+			// Find if neighbours are visited.
 			neighCell = c.neigh[dirSet[i]];
 			if(neighCell != null) {
 				if(neighCell.visited == false)	{
-					//Mark cells as visited
+					// Mark cells as visited.
 					c.visited = true;
 					neighCell.visited = true;
-					//Push to stack
+					
+					// Push to stack.
 					dfsStack.push(c);
-					//Disable wall
+					// Disable wall.
 					c.wall[dirSet[i]].present = false;
-					//Return neighbour cell to function
+					// Return neighbour cell to function.
 					return getUnvisited(neighCell, dirSet);
 				}
 			}
 		}
 		
-		//Backtrack if no unvisited neighbours
+		// Backtrack if no unvisited neighbours.
 		if(!dfsStack.isEmpty()) {
 			return backtrack(dfsStack.pop(), dirSet);
 		}
@@ -89,11 +112,11 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 		
 	}
 	
-	public Cell backtrack(Cell c, Integer[] dirSet) {
+	private Cell backtrack(Cell c, Integer[] dirSet) {
 		
 		Cell neighCell;
 		
-		//If there is a tunnel, just backtrack to the previous item
+		// If there is a tunnel, just backtrack to the previous item
 		if(c.tunnelTo != null)	{
 			if(!dfsStack.isEmpty()) {
 				return backtrack(dfsStack.pop(), dirSet);
