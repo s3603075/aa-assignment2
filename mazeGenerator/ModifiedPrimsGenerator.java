@@ -8,8 +8,7 @@ import maze.Cell;
 import maze.Maze;
 
 public class ModifiedPrimsGenerator implements MazeGenerator {
-	
-	Integer dirSetN[];
+
 	ArrayList<Cell> setZ = new ArrayList<Cell>();
 	ArrayList<Cell> setF = new ArrayList<Cell>();
 
@@ -27,16 +26,6 @@ public class ModifiedPrimsGenerator implements MazeGenerator {
 
 	@Override
 	public void generateMaze(Maze maze) {
-		
-		// Determining the valid neighbour directions based on maze type.
-		switch(maze.type){
-			case Maze.NORMAL:
-				dirSetN = new Integer[]{Maze.NORTH, Maze.EAST, Maze.SOUTH, Maze.WEST};
-				break;
-			case Maze.HEX:
-				dirSetN = new Integer[]{Maze.NORTHEAST, Maze.EAST, Maze.SOUTHEAST, Maze.SOUTHWEST, Maze.WEST, Maze.NORTHWEST};
-				break;
-		}
 
 		// Picking a random starting cell.
 		int randC = ThreadLocalRandom.current().nextInt(0, maze.sizeC);
@@ -104,7 +93,7 @@ public class ModifiedPrimsGenerator implements MazeGenerator {
 		Cell b = validNeighbours.get(randIndex);
 
 		// Finding the wall between b and c place in the maze.
-		Integer cWall = dirSetN[Arrays.asList(c.neigh).indexOf(b)];
+		Integer cWall = Arrays.asList(c.neigh).indexOf(b);
 		
 		// Remove wall
 		c.wall[cWall].present = false;
