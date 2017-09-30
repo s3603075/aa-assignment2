@@ -17,6 +17,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 	private Stack<Cell> entranceStack = new Stack<Cell>();
 	private Stack<Cell> exitStack = new Stack<Cell>();
 	private int steps = 0;
+	private int stackTurn = 0;
 	
 	@Override
 	public void solveMaze(Maze maze) {
@@ -28,52 +29,40 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 		entranceStack.add(maze.entrance);
 		exitStack.add(maze.exit);
 		
-		// While we have not reached a terminating condition...
-		Boolean complete = false;
-		
-		// stackTurn alternates between the stacks.
-		// Less repeated code.
-		int stackTurn = 2;
-		
-		while(complete == false){
-			if(stackTurn % 2 == 0){
-				// If there are no new, valid neighbours to add to the stack...
-				if(addNeighbourToStack(entranceStack) == false){
-					// If we can't backtrack anymore...
-					if(backTrack(entranceStack, 1) == false){
-						// Then one of the stacks would be empty, and we can't have the 2 fronts link
-						break;
-					}
-				}else{
-					// Mark new node as visited, include in counter.
-					entranceStack.peek().visited = true;
-					steps++;
-				}
-				stackTurn = 1;
-				
-			}else{
-				
-				if(addNeighbourToStack(exitStack) == false){
-					if(backTrack(exitStack, 1) == false){
-						break;
-					}
-				}else{
-					exitStack.peek().visited = true;
-					steps++;
-				}
-				stackTurn = 2;
-			}
-			
-			// Since we alternate between DFS steps for the entrance and exit stacks I have 2 checkCollisions()
-			// If you know a good way to alternate
-			if(checkCollision() == true){
-				break;
-			}
-
-		}
+		findNewPath(entranceStack);
 
 	} // end of solveMaze()
 
+	
+	private Boolean findNewPath(Stack<Cell> stack){
+		// If we've found a path, propagate the true back up the calls
+		if(checkCollision() == true){
+			return true;
+		}
+		
+		// Otherwise, try to add a neighbour, mark it as visited, increment the search count
+		if(addNeighbourToStack(entranceStack) == true){
+			stack.peek().visited = true;
+			steps++;
+
+		// If there are no new neighbours, try to backtrack
+		}else{
+			if(backTrack(entranceStack, 1) == false){
+				// If we can't backtrack, something went wrong and there is no solution
+				return false;
+			}
+		}
+		
+		// Alternate between which stack gets called.
+		if(stackTurn == 0){
+			stackTurn = 1;
+			return findNewPath(entranceStack);
+		}else{
+			stackTurn = 0;
+			return findNewPath(exitStack);
+		}
+	}
+	
 	
 	private Boolean addNeighbourToStack(Stack<Cell> stack){
 		
