@@ -133,7 +133,6 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 	
 
 	// Backtracks a stack by a given amount.
-	// Can probably change this to just backtrack once.
 	private Boolean backTrack(Stack<Cell> stack){
 		if(stack.empty() == false){
 			stack.pop();
@@ -146,6 +145,8 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 
 	@Override
 	public boolean isSolved() {
+		
+		// Need find path first
 		return solved;
 	} // end if isSolved()
 
