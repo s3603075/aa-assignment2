@@ -25,17 +25,22 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 		
 		// Adding the base nodes
 		maze.entrance.visited = true;
+		steps++;
+		maze.drawFtPrt(maze.entrance);
+		
 		maze.exit.visited = true;
+		steps++;
+		maze.drawFtPrt(maze.exit);
 		
 		entranceStack.add(maze.entrance);
 		exitStack.add(maze.exit);
 		
-		solved = findNewPath(entranceStack);
+		solved = findNewPath(entranceStack, maze);
 
 	} // end of solveMaze()
 
 	
-	private Boolean findNewPath(Stack<Cell> stack){
+	private Boolean findNewPath(Stack<Cell> stack, Maze maze){
 		// If we've found a path, propagate the true back up the calls
 		if(checkCollision() == true){
 			return true;
@@ -44,6 +49,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 		if(stack.peek().tunnelTo != null){
 			stack.peek().visited = true;
 			steps++;
+			maze.drawFtPrt(stack.peek());
 			stack.push(stack.peek().tunnelTo);
 		}else{
 		
@@ -51,6 +57,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 			if(addNeighbourToStack(entranceStack) == true){
 				stack.peek().visited = true;
 				steps++;
+				maze.drawFtPrt(stack.peek());
 	
 			// If there are no new neighbours, try to backtrack
 			}else{
@@ -64,10 +71,10 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 		// Alternate between which stack gets called.
 		if(stackTurn == 0){
 			stackTurn = 1;
-			return findNewPath(entranceStack);
+			return findNewPath(entranceStack, maze);
 		}else{
 			stackTurn = 0;
-			return findNewPath(exitStack);
+			return findNewPath(exitStack, maze);
 		}
 	}
 	

@@ -43,6 +43,7 @@ public class WallFollowerSolver implements MazeSolver {
 			 }
 
 			 currentCell.visited = true;
+			 maze.drawFtPrt(currentCell);
 			 currentCell = nextCell;
 			 steps++;
 			 
