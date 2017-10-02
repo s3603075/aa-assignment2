@@ -51,17 +51,18 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 			steps++;
 			maze.drawFtPrt(stack.peek());
 			stack.push(stack.peek().tunnelTo);
+			
 		}else{
 		
 			// Otherwise, try to add a neighbour, mark it as visited, increment the search count
-			if(addNeighbourToStack(entranceStack) == true){
+			if(addNeighbourToStack(stack) == true){
 				stack.peek().visited = true;
 				steps++;
 				maze.drawFtPrt(stack.peek());
 	
 			// If there are no new neighbours, try to backtrack
 			}else{
-				if(backTrack(entranceStack, 1) == false){
+				if(backTrack(stack) == false){
 					// If we can't backtrack, something went wrong and there is no solution
 					return false;
 				}
@@ -133,11 +134,9 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 
 	// Backtracks a stack by a given amount.
 	// Can probably change this to just backtrack once.
-	private Boolean backTrack(Stack<Cell> stack, int x){
-		if(stack.size() > 0){
-			for(int i=0; i<x; i++){
-				stack.pop();
-			}
+	private Boolean backTrack(Stack<Cell> stack){
+		if(stack.empty() == false){
+			stack.pop();
 			return true;
 		}
 		

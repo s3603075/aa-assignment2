@@ -18,20 +18,20 @@ public class WallFollowerSolver implements MazeSolver {
 	public void solveMaze(Maze maze) {
 
 		 currentCell = maze.entrance;
-		 Cell nextCell = maze.entrance;
+		 Cell nextCell = null;
 
 		 // Find current direction
 		 for(int i=0; i<currentCell.neigh.length; i++){
-			 if(currentCell.wall[i] != null){
-				 currentDirection = i;
-				 break;
+			 if(currentCell.neigh[i] != null){
+				 if(currentCell.wall[i].present == false){
+					 currentDirection = i;
+					 break;
+				 }
 			 }
 		 }
-		 
-		 
+
 		 
 		 while(currentCell != maze.exit){
-			 
 			 if(currentCell.tunnelTo == null){
 				 nextCell = findNext(currentDirection, currentCell.neigh.length, currentCell);
 				 if(nextCell == null){
@@ -52,8 +52,10 @@ public class WallFollowerSolver implements MazeSolver {
 				 Boolean endPath = true;
 				 // If there are any new paths, continue the loop
 				 for(int i=0; i<currentCell.neigh.length; i++){
-					 if(currentCell.neigh[i].visited == false){
-						 endPath = false;
+					 if(currentCell.neigh[i] != null){
+						 if(currentCell.neigh[i].visited == false){
+							 endPath = false;
+						 }
 					 }
 				 }
 				 
@@ -71,7 +73,7 @@ public class WallFollowerSolver implements MazeSolver {
 
 	private Cell findNext(int startDirection, int endDirection, Cell current){
 		
-		for(int i=startDirection; i<endDirection; i++){
+		for(int i=startDirection; i<=endDirection; i++){
 			if(current.neigh[i] != null){
 				if(current.wall[i].present == false){
 					currentDirection = i;
