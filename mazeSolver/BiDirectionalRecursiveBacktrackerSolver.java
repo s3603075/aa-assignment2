@@ -18,6 +18,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 	private Stack<Cell> exitStack = new Stack<Cell>();
 	private int steps = 0;
 	private int stackTurn = 0;
+	private Boolean solved = false;
 	
 	@Override
 	public void solveMaze(Maze maze) {
@@ -29,7 +30,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 		entranceStack.add(maze.entrance);
 		exitStack.add(maze.exit);
 		
-		findNewPath(entranceStack);
+		solved = findNewPath(entranceStack);
 
 	} // end of solveMaze()
 
@@ -40,16 +41,23 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 			return true;
 		}
 		
-		// Otherwise, try to add a neighbour, mark it as visited, increment the search count
-		if(addNeighbourToStack(entranceStack) == true){
+		if(stack.peek().tunnelTo != null){
 			stack.peek().visited = true;
 			steps++;
-
-		// If there are no new neighbours, try to backtrack
+			stack.push(stack.peek().tunnelTo);
 		}else{
-			if(backTrack(entranceStack, 1) == false){
-				// If we can't backtrack, something went wrong and there is no solution
-				return false;
+		
+			// Otherwise, try to add a neighbour, mark it as visited, increment the search count
+			if(addNeighbourToStack(entranceStack) == true){
+				stack.peek().visited = true;
+				steps++;
+	
+			// If there are no new neighbours, try to backtrack
+			}else{
+				if(backTrack(entranceStack, 1) == false){
+					// If we can't backtrack, something went wrong and there is no solution
+					return false;
+				}
 			}
 		}
 		
@@ -132,8 +140,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 
 	@Override
 	public boolean isSolved() {
-		// TODO Auto-generated method stub
-		return false;
+		return solved;
 	} // end if isSolved()
 
 

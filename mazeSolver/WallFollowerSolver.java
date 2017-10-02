@@ -12,6 +12,7 @@ public class WallFollowerSolver implements MazeSolver {
 	private int steps = 0; 
 	private Cell currentCell;
 	private Integer currentDirection;
+	private Boolean solved = true;
 	
 	@Override
 	public void solveMaze(Maze maze) {
@@ -19,6 +20,7 @@ public class WallFollowerSolver implements MazeSolver {
 		 currentCell = maze.entrance;
 		 Cell nextCell = maze.entrance;
 
+		 // Find current direction
 		 for(int i=0; i<currentCell.neigh.length; i++){
 			 if(currentCell.wall[i] != null){
 				 currentDirection = i;
@@ -26,11 +28,12 @@ public class WallFollowerSolver implements MazeSolver {
 			 }
 		 }
 		 
+		 
+		 
 		 while(currentCell != maze.exit){
 			 
 			 if(currentCell.tunnelTo == null){
 				 nextCell = findNext(currentDirection, currentCell.neigh.length, currentCell);
-				 
 				 if(nextCell == null){
 					 nextCell = findNext(0, currentDirection, currentCell);
 				 }
@@ -43,10 +46,27 @@ public class WallFollowerSolver implements MazeSolver {
 			 currentCell = nextCell;
 			 steps++;
 			 
+			 // Checking if we are back at the start with no new pathways to take.
+			 if(currentCell == maze.entrance){
+				 Boolean endPath = true;
+				 // If there are any new paths, continue the loop
+				 for(int i=0; i<currentCell.neigh.length; i++){
+					 if(currentCell.neigh[i].visited == false){
+						 endPath = false;
+					 }
+				 }
+				 
+				 // Otherwise we didn't find the solution.
+				 if(endPath == true){
+					 solved = false;
+					 break;
+				 }
+			 }
 		 }
 
 	} // end of solveMaze()
     
+	
 
 	private Cell findNext(int startDirection, int endDirection, Cell current){
 		
@@ -65,11 +85,8 @@ public class WallFollowerSolver implements MazeSolver {
     
 	@Override
 	public boolean isSolved() {
-		// Is it even possible to determine if the maze was solved without knowing the maze exit?
 		
-		// Can't change parameters of this.
-		
-		return false;
+		return solved;
 	} // end if isSolved()
     
     
