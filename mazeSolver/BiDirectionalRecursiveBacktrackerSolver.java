@@ -2,9 +2,9 @@ package mazeSolver;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-
 import maze.Cell;
 import maze.Maze;
+import maze.Wall;
 
 /**
  * Implements the BiDirectional recursive backtracking maze solving algorithm.
@@ -17,66 +17,68 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 	private Stack<Cell> entranceStack = new Stack<Cell>();
 	private Stack<Cell> exitStack = new Stack<Cell>();
 	private int steps = 0;
-	private int stackTurn = 0;
-	private Boolean solved = false;
+	private int stackTurn = 1;
+	
+	private ArrayList<Cell> path = null;
+	private Maze map = null;
 	
 	@Override
 	public void solveMaze(Maze maze) {
 		
+		map = maze;
+		
 		// Adding the base nodes
+		entranceStack.push(maze.entrance);
 		maze.entrance.visited = true;
 		steps++;
 		maze.drawFtPrt(maze.entrance);
 		
+		exitStack.push(maze.exit);
 		maze.exit.visited = true;
 		steps++;
 		maze.drawFtPrt(maze.exit);
 		
-		entranceStack.add(maze.entrance);
-		exitStack.add(maze.exit);
-		
-		solved = findNewPath(entranceStack, maze);
+		findNewPath(entranceStack);
+		combinePath();
 
 	} // end of solveMaze()
-
 	
-	private Boolean findNewPath(Stack<Cell> stack, Maze maze){
-		// If we've found a path, propagate the true back up the calls
-		if(checkCollision() == true){
-			return true;
-		}
+	
+	private void findNewPath(Stack<Cell> stack){
 		
-		if(stack.peek().tunnelTo != null){
-			stack.peek().visited = true;
-			steps++;
-			maze.drawFtPrt(stack.peek());
-			stack.push(stack.peek().tunnelTo);
+		// Determines whether we call findNewPath again.
+		Boolean call = false;
+		
+		// If we've haven't found a collision...
+		if(checkCollision() == false){
 			
-		}else{
-		
-			// Otherwise, try to add a neighbour, mark it as visited, increment the search count
+			// Try to add a neighbour, mark it as visited, increment the search count
 			if(addNeighbourToStack(stack) == true){
 				stack.peek().visited = true;
 				steps++;
-				maze.drawFtPrt(stack.peek());
-	
-			// If there are no new neighbours, try to backtrack
+				map.drawFtPrt(stack.peek());
+				call = true;
+			
+			// If there were no neighbours, try to backtrack
 			}else{
-				if(backTrack(stack) == false){
-					// If we can't backtrack, something went wrong and there is no solution
-					return false;
+				// If we can successfully backtrack, call again
+				if(backTrack(stack) == true){
+					call = true;
 				}
 			}
 		}
-		
-		// Alternate between which stack gets called.
-		if(stackTurn == 0){
-			stackTurn = 1;
-			return findNewPath(entranceStack, maze);
-		}else{
-			stackTurn = 0;
-			return findNewPath(exitStack, maze);
+			
+		if(call == true){
+			// Alternate between which stack gets called.
+			if(stackTurn == 0){
+				stackTurn = 1;
+				findNewPath(entranceStack);
+			}else{
+				stackTurn = 0;
+				findNewPath(exitStack);
+			}
 		}
+		
 	}
 	
 	
@@ -94,6 +96,10 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 			}
 		}
 		
+		if(cell.tunnelTo != null){
+			neighbours.add(cell.tunnelTo);
+		}
+		
 		// If there were no valid neighbours, return false.
 		if(neighbours.size() == 0){
 			return false;
@@ -101,7 +107,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 
 		// Push a random valid neighbour onto the stack
 		int rand = ThreadLocalRandom.current().nextInt(0, neighbours.size());
-		entranceStack.push(neighbours.get(rand));
+		stack.push(neighbours.get(rand));
 		
 		return true;
 	}
@@ -125,8 +131,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 				return true;
 			}
 		}
-		
-		
+
 		// No collision.
 		return false;
 	}
@@ -143,16 +148,71 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 		return false;
 	}
 
+	private void combinePath(){
+		path = new ArrayList<Cell>(entranceStack);
+
+		@SuppressWarnings("unchecked")
+		Stack<Cell> tempExit = (Stack<Cell>) exitStack.clone();
+		
+		while(tempExit.size() > 0){
+			path.add(tempExit.peek());
+			tempExit.pop();
+		}
+
+	}
+	
+	
+	
 	@Override
 	public boolean isSolved() {
-		
-		// Need find path first
-		return solved;
-	} // end if isSolved()
+		// If the path is empty, then we didn't solve the maze.
+		if(path.isEmpty() == true){
+			return false;
+		}
 
+		// If the 1st part of the path is the entrance...
+		if(path.get(0) == map.entrance){
+					
+			Cell current;
+			Cell next;
+			Wall wall;
+			
+			// Loop through each element in the path,
+			for(int i=0; i<path.size() - 1; i++){
+				
+				current = path.get(i);
+				next = path.get(i+1);
+						
+				// Check if we can reach the next item in the path
+				if(Arrays.asList(current.neigh).contains(next) || current.tunnelTo == next){
+					
+					// If the next item wasn't a tunnel, we need to check if there was a wall there
+					if(current.tunnelTo != next){
+						wall = current.wall[Arrays.asList(current.neigh).indexOf(next)];
+						if(wall.present == true){
+							return false;
+						}
+					}
+					
+				}else{
+					return false;
+				}
+			}
+			
+			// Check if the last element in the path is the exit
+			if(path.get(path.size() - 1) == map.exit){
+				// If it passed all of these checks, then the maze was solved.
+				return true;
+			}
+					
+		}		
+				
+		return false;
+	} // end if isSolved()
+   
 
 	@Override
-	public int cellsExplored() {
+	public int cellsExplored() {		
 		return steps;
 	} // end of cellsExplored()
 
