@@ -21,6 +21,8 @@ public class Cell {
 	
 	public boolean visited = false;
 	
+	public boolean solveVisited = false;
+	
 	/**
 	 * wall[i] is the wall on direction i of the cell
 	 */

@@ -29,12 +29,12 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 		
 		// Adding the base nodes
 		entranceStack.push(maze.entrance);
-		maze.entrance.visited = true;
+		maze.entrance.solveVisited = true;
 		steps++;
 		maze.drawFtPrt(maze.entrance);
 		
 		exitStack.push(maze.exit);
-		maze.exit.visited = true;
+		maze.exit.solveVisited = true;
 		steps++;
 		maze.drawFtPrt(maze.exit);
 		
@@ -52,9 +52,9 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 		// If we've haven't found a collision...
 		if(checkCollision() == false){
 			
-			// Try to add a neighbour, mark it as visited, increment the search count
+			// Try to add a neighbour, mark it as solveVisited, increment the search count
 			if(addNeighbourToStack(stack) == true){
-				stack.peek().visited = true;
+				stack.peek().solveVisited = true;
 				steps++;
 				map.drawFtPrt(stack.peek());
 				call = true;
@@ -90,7 +90,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 		// For each potential neighbour...
 		for(int i=0; i<cell.neigh.length; i++){
 			// If it is valid...
-			if(cell.neigh[i] != null && cell.neigh[i].visited == false && cell.wall[i].present == false){
+			if(cell.neigh[i] != null && cell.neigh[i].solveVisited == false && cell.wall[i].present == false){
 				// Put in pool for random selection
 				neighbours.add(cell.neigh[i]);	
 			}

@@ -52,7 +52,7 @@ public class WallFollowerSolver implements MazeSolver {
 				 break;
 			 }
 
-			 currentCell.visited = true;
+			 currentCell.solveVisited = true;
 			 path.add(currentCell);
 			 maze.drawFtPrt(currentCell);
 			 currentCell = nextCell;
@@ -68,7 +68,7 @@ public class WallFollowerSolver implements MazeSolver {
 		if(currentCell == map.entrance){
 			for(int i=0; i<currentCell.neigh.length; i++){
 				 if(currentCell.neigh[i] != null){
-					 if(currentCell.neigh[i].visited == false){
+					 if(currentCell.neigh[i].solveVisited == false){
 						 return true;
 					 }
 				 }
