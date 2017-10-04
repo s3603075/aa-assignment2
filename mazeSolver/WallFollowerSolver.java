@@ -25,7 +25,6 @@ public class WallFollowerSolver implements MazeSolver {
 		
 		currentCell = map.entrance;
 		path.add(currentCell);
-		Cell nextCell;
 		
 		 // Find current direction
 		for(int i=0; i<currentCell.neigh.length; i++){
@@ -36,66 +35,78 @@ public class WallFollowerSolver implements MazeSolver {
 				 }
 			 }
 		 }
-
-		 while(currentCell != map.exit){
-			 
-			 if(endOfPath(currentCell) == true){
-				 break;
-			 }
-			 
-			 nextCell = findNext(currentDirection, currentCell.neigh.length, currentCell);
-			 if(nextCell == null){
-				 nextCell = findNext(0, currentDirection, currentCell);
-			 }
-			 
-			 if(nextCell == null){
-				 break;
-			 }
-
-			 currentCell.solveVisited = true;
-			 path.add(currentCell);
-			 maze.drawFtPrt(currentCell);
-			 currentCell = nextCell;
-			 steps++;
-			 
-		 }
+		
+		int leftCell;
+		int rightCell;
+		
+		while(currentCell != map.exit)	{
+			maze.drawFtPrt(currentCell);
+			leftCell = getLeftTurn(currentDirection);
+			//Turn left 90 degrees
+			if(currentCell.wall[leftCell].present == false)	{
+				currentCell = currentCell.neigh[leftCell];
+				path.add(currentCell);
+				steps++;
+				currentDirection = leftCell;
+			}
+			//Go forward if there is left wall
+			else if(currentCell.wall[currentDirection].present == false) {
+				currentCell = currentCell.neigh[currentDirection];
+				steps++;
+				path.add(currentCell);
+			}
+			//Turn right 90 degrees if walls in front and left
+			else {
+				rightCell = getRightTurn(currentDirection);
+				currentDirection = rightCell;
+			}
+			
+		}
+		
+		System.out.println(currentCell.c + "," + currentCell.r);
+		System.out.println(map.exit.c + "," + map.exit.r);
 
 	} // end of solveMaze()
-
 	
-	private Boolean endOfPath(Cell current){
+	private int getLeftTurn(int cellDir) {
 		
-		if(currentCell == map.entrance){
-			for(int i=0; i<currentCell.neigh.length; i++){
-				 if(currentCell.neigh[i] != null){
-					 if(currentCell.neigh[i].solveVisited == false){
-						 return true;
-					 }
-				 }
-			 }
+		switch(cellDir)	{
+		case Maze.NORTH:
+			cellDir = Maze.WEST;
+			break;
+		case Maze.EAST:
+			cellDir = Maze.NORTH;
+			break;
+		case Maze.SOUTH:
+			cellDir = Maze.EAST;
+			break;
+		case Maze.WEST:
+			cellDir = Maze.SOUTH;
+			break;
 		}
-		return false;
+		
+		return cellDir;
 	}
 	
-
-	private Cell findNext(int startDirection, int endDirection, Cell current){
+	private int getRightTurn(int cellDir) {
 		
-		for(int i=startDirection; i<endDirection; i++){
-			if(current.neigh[i] != null){
-				if(current.wall[i].present == false){
-					currentDirection = i;
-					return current.neigh[i];
-				}
-			}
+		switch(cellDir)	{
+		case Maze.NORTH:
+			cellDir = Maze.EAST;
+			break;
+		case Maze.EAST:
+			cellDir = Maze.SOUTH;
+			break;
+		case Maze.SOUTH:
+			cellDir = Maze.WEST;
+			break;
+		case Maze.WEST:
+			cellDir = Maze.NORTH;
+			break;
 		}
 		
-		if(current.tunnelTo != null){
-			return current.tunnelTo;
-		}
-		
-		return null;
+		return cellDir;
 	}
-	
     
 	@Override
 	public boolean isSolved() {
