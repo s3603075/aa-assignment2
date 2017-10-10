@@ -41,6 +41,11 @@ public class WallFollowerSolver implements MazeSolver {
 		
 		while(currentCell != map.exit)	{
 			maze.drawFtPrt(currentCell);
+			
+			if(currentCell.tunnelTo != null)	{
+				currentCell = currentCell.tunnelTo;
+			}
+			
 			leftCell = getLeftTurn(currentDirection);
 			//Turn left 90 degrees
 			if(currentCell.wall[leftCell].present == false)	{
@@ -52,8 +57,8 @@ public class WallFollowerSolver implements MazeSolver {
 			//Go forward if there is left wall
 			else if(currentCell.wall[currentDirection].present == false) {
 				currentCell = currentCell.neigh[currentDirection];
-				steps++;
 				path.add(currentCell);
+				steps++;	
 			}
 			//Turn right 90 degrees if walls in front and left
 			else {
