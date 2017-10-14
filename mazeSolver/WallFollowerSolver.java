@@ -44,6 +44,8 @@ public class WallFollowerSolver implements MazeSolver {
 			
 			if(currentCell.tunnelTo != null)	{
 				currentCell = currentCell.tunnelTo;
+				maze.drawFtPrt(currentCell);
+				path.add(currentCell);
 			}
 			
 			leftCell = getLeftTurn(currentDirection);
@@ -68,8 +70,7 @@ public class WallFollowerSolver implements MazeSolver {
 			
 		}
 		
-		System.out.println(currentCell.c + "," + currentCell.r);
-		System.out.println(map.exit.c + "," + map.exit.r);
+		maze.drawFtPrt(currentCell);
 
 	} // end of solveMaze()
 	
@@ -116,6 +117,7 @@ public class WallFollowerSolver implements MazeSolver {
 	@Override
 	public boolean isSolved() {
 		// If the path is empty, then we didn't solve the maze.
+		
 		if(path.isEmpty() == true){
 			return false;
 		}
