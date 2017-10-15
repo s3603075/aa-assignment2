@@ -46,60 +46,109 @@ public class WallFollowerSolver implements MazeSolver {
 
 	} // end of solveMaze()
 	
-	private int getTurnHex(int cellDir, Cell currentCell)	{
-		
-		map.drawFtPrt(currentCell);
+
+	
+	private void getTurnHex(int currentDirection, Cell currentCell)	{
+	
 		path.add(currentCell);
-		steps++;
+	
+		int leftCell;
+		int secLeftCell;
+		int rightCell;
+		int secRightCell;
 		
-		if(currentCell == map.exit)	{
-			return 1;
-		}
-		
-		switch(cellDir)	{
-			case Maze.WEST:
-				//Check left turn, then straight, then right turns, then back
-				Integer[] westDir = {Maze.SOUTHEAST, Maze.SOUTHWEST, Maze.WEST, Maze.NORTHWEST, Maze.NORTHEAST, Maze.EAST};
-				//Iterate for all possibilities
-				iterateDirectionsHex(cellDir, currentCell, westDir);
-				break;
-			case Maze.EAST:
-				Integer[] eastDir = {Maze.NORTHWEST, Maze.NORTHEAST, Maze.EAST, Maze.SOUTHEAST, Maze.SOUTHWEST, Maze.WEST};
-				iterateDirectionsHex(cellDir, currentCell, eastDir);
-				break;
-			case Maze.SOUTHEAST:
-				Integer[] seDir = {Maze.NORTHEAST, Maze.EAST, Maze.SOUTHEAST, Maze.SOUTHWEST, Maze.WEST, Maze.NORTHWEST};
-				iterateDirectionsHex(cellDir, currentCell, seDir);
-				break;
-			case Maze.SOUTHWEST:
-				Integer[] swDir = {Maze.EAST, Maze.SOUTHEAST, Maze.SOUTHWEST, Maze.WEST, Maze.NORTHWEST, Maze.NORTHEAST};
-				iterateDirectionsHex(cellDir, currentCell, swDir);
-				break;
-			case Maze.NORTHEAST:
-				Integer[] neDir = {Maze.WEST, Maze.NORTHWEST, Maze.NORTHEAST, Maze.EAST, Maze.SOUTHEAST, Maze.SOUTHWEST};
-				iterateDirectionsHex(cellDir, currentCell, neDir);
-				break;
-			case Maze.NORTHWEST:
-				Integer[] nwDir = {Maze.SOUTHWEST, Maze.WEST, Maze.NORTHWEST, Maze.NORTHEAST, Maze.EAST, Maze.SOUTHEAST};
-				iterateDirectionsHex(cellDir, currentCell, nwDir);
-				break;
+		while(currentCell != map.exit)	{
+			map.drawFtPrt(currentCell);
 			
-		}
+			leftCell = getLeftHexTurn(currentDirection);
+			secLeftCell = getLeftHexTurn(leftCell);
+			//Turn left 90 degrees
+			if(currentCell.wall[secLeftCell].present == false)	{
+				currentCell = currentCell.neigh[secLeftCell];
+				path.add(currentCell);
+				steps++;
+				currentDirection = secLeftCell;
+			}
+			else if(currentCell.wall[leftCell].present == false)	{
+				currentCell = currentCell.neigh[leftCell];
+				path.add(currentCell);
+				steps++;
+				currentDirection = leftCell;
+			}
+			//Go forward if there is left wall
+			else if(currentCell.wall[currentDirection].present == false) {
+				currentCell = currentCell.neigh[currentDirection];
+				path.add(currentCell);
+				steps++;	
+			}
+			//Turn right 90 degrees if walls in front and left
+			else {
+				rightCell = getRightHexTurn(currentDirection);
+				secRightCell = getRightHexTurn(rightCell);
+				if(currentCell.wall[rightCell].present == true)	{
+					currentDirection = secRightCell;
+				}
+				else	{
+					currentDirection = rightCell;
+				}
+				
+			}
 		
-		return 0;
+		}
+	
+		map.drawFtPrt(currentCell);
 	}
 	
-	private int iterateDirectionsHex(int cellDir, Cell currentCell, Integer[] dirSet)	{
+	private int getLeftHexTurn(int cellDir) {
 		
-		for(int i=0; i < dirSet.length; i++)	{
-			if(currentCell.neigh[dirSet[i]] != null)	{
-				if(currentCell.wall[dirSet[i]].present == false)	{
-					return getTurnHex(dirSet[i], currentCell.neigh[dirSet[i]]);
-				}
-			}
+		switch(cellDir)	{
+			case Maze.EAST:
+				cellDir = Maze.NORTHEAST;
+				break;
+			case Maze.NORTHEAST:
+				cellDir = Maze.NORTHWEST;
+				break;
+			case Maze.NORTHWEST:
+				cellDir = Maze.WEST;
+				break;
+			case Maze.WEST:
+				cellDir = Maze.SOUTHWEST;
+				break;
+			case Maze.SOUTHWEST:
+				cellDir = Maze.SOUTHEAST;
+				break;
+			case Maze.SOUTHEAST:
+				cellDir = Maze.EAST;
+				break;
 		}
 		
-		return -1;
+		return cellDir;
+	}
+	
+	private int getRightHexTurn(int cellDir) {
+		
+		switch(cellDir)	{
+			case Maze.EAST:
+				cellDir = Maze.SOUTHEAST;
+				break;
+			case Maze.SOUTHEAST:
+				cellDir = Maze.SOUTHWEST;
+				break;
+			case Maze.SOUTHWEST:
+				cellDir = Maze.WEST;
+				break;
+			case Maze.WEST:
+				cellDir = Maze.NORTHWEST;
+				break;
+			case Maze.NORTHWEST:
+				cellDir = Maze.NORTHEAST;
+				break;
+			case Maze.NORTHEAST:
+				cellDir = Maze.EAST;
+				break;
+		}
+		
+		return cellDir;
 	}
 	
 	private void getTurnNormal(int currentDirection, Cell currentCell)	{
