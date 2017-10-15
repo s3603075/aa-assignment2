@@ -24,8 +24,6 @@ public class WallFollowerSolver implements MazeSolver {
 		map = maze;
 		
 		currentCell = map.entrance;
-		path.add(currentCell);
-		Cell nextCell;
 		
 		 // Find current direction
 		for(int i=0; i<currentCell.neigh.length; i++){
@@ -36,70 +34,208 @@ public class WallFollowerSolver implements MazeSolver {
 				 }
 			 }
 		 }
-
-		 while(currentCell != map.exit){
-			 
-			 if(endOfPath(currentCell) == true){
-				 break;
-			 }
-			 
-			 nextCell = findNext(currentDirection, currentCell.neigh.length, currentCell);
-			 if(nextCell == null){
-				 nextCell = findNext(0, currentDirection, currentCell);
-			 }
-			 
-			 if(nextCell == null){
-				 break;
-			 }
-
-			 currentCell.solveVisited = true;
-			 path.add(currentCell);
-			 maze.drawFtPrt(currentCell);
-			 currentCell = nextCell;
-			 steps++;
-			 
-		 }
+		
+		if(maze.type != Maze.HEX)	{
+			getTurnNormal(currentDirection, currentCell);
+		}
+		else	{
+			getTurnHex(currentDirection, currentCell);
+		}
+		
+		
 
 	} // end of solveMaze()
-
-	
-	private Boolean endOfPath(Cell current){
-		
-		if(currentCell == map.entrance){
-			for(int i=0; i<currentCell.neigh.length; i++){
-				 if(currentCell.neigh[i] != null){
-					 if(currentCell.neigh[i].solveVisited == false){
-						 return true;
-					 }
-				 }
-			 }
-		}
-		return false;
-	}
 	
 
-	private Cell findNext(int startDirection, int endDirection, Cell current){
+	
+	private void getTurnHex(int currentDirection, Cell currentCell)	{
+	
+		path.add(currentCell);
+	
+		int leftCell;
+		int secLeftCell;
+		int rightCell;
+		int secRightCell;
 		
-		for(int i=startDirection; i<endDirection; i++){
-			if(current.neigh[i] != null){
-				if(current.wall[i].present == false){
-					currentDirection = i;
-					return current.neigh[i];
-				}
+		while(currentCell != map.exit)	{
+			map.drawFtPrt(currentCell);
+			
+			leftCell = getLeftHexTurn(currentDirection);
+			secLeftCell = getLeftHexTurn(leftCell);
+			//Turn left 90 degrees
+			if(currentCell.wall[secLeftCell].present == false)	{
+				currentCell = currentCell.neigh[secLeftCell];
+				path.add(currentCell);
+				steps++;
+				currentDirection = secLeftCell;
 			}
-		}
+			else if(currentCell.wall[leftCell].present == false)	{
+				currentCell = currentCell.neigh[leftCell];
+				path.add(currentCell);
+				steps++;
+				currentDirection = leftCell;
+			}
+			//Go forward if there is left wall
+			else if(currentCell.wall[currentDirection].present == false) {
+				currentCell = currentCell.neigh[currentDirection];
+				path.add(currentCell);
+				steps++;	
+			}
+			//Turn right 90 degrees if walls in front and left
+			else {
+				rightCell = getRightHexTurn(currentDirection);
+				secRightCell = getRightHexTurn(rightCell);
+				if(currentCell.wall[rightCell].present == true)	{
+					currentDirection = secRightCell;
+				}
+				else	{
+					currentDirection = rightCell;
+				}
+				
+			}
 		
-		if(current.tunnelTo != null){
-			return current.tunnelTo;
 		}
-		
-		return null;
+	
+		map.drawFtPrt(currentCell);
 	}
 	
+	private int getLeftHexTurn(int cellDir) {
+		
+		switch(cellDir)	{
+			case Maze.EAST:
+				cellDir = Maze.NORTHEAST;
+				break;
+			case Maze.NORTHEAST:
+				cellDir = Maze.NORTHWEST;
+				break;
+			case Maze.NORTHWEST:
+				cellDir = Maze.WEST;
+				break;
+			case Maze.WEST:
+				cellDir = Maze.SOUTHWEST;
+				break;
+			case Maze.SOUTHWEST:
+				cellDir = Maze.SOUTHEAST;
+				break;
+			case Maze.SOUTHEAST:
+				cellDir = Maze.EAST;
+				break;
+		}
+		
+		return cellDir;
+	}
+	
+	private int getRightHexTurn(int cellDir) {
+		
+		switch(cellDir)	{
+			case Maze.EAST:
+				cellDir = Maze.SOUTHEAST;
+				break;
+			case Maze.SOUTHEAST:
+				cellDir = Maze.SOUTHWEST;
+				break;
+			case Maze.SOUTHWEST:
+				cellDir = Maze.WEST;
+				break;
+			case Maze.WEST:
+				cellDir = Maze.NORTHWEST;
+				break;
+			case Maze.NORTHWEST:
+				cellDir = Maze.NORTHEAST;
+				break;
+			case Maze.NORTHEAST:
+				cellDir = Maze.EAST;
+				break;
+		}
+		
+		return cellDir;
+	}
+	
+	private void getTurnNormal(int currentDirection, Cell currentCell)	{
+		
+		path.add(currentCell);
+		
+		int leftCell;
+		int rightCell;
+		
+		while(currentCell != map.exit)	{
+			map.drawFtPrt(currentCell);
+			
+			if(currentCell.tunnelTo != null)	{
+				currentCell = currentCell.tunnelTo;
+				map.drawFtPrt(currentCell);
+				path.add(currentCell);
+			}
+			
+			leftCell = getLeftTurn(currentDirection);
+			//Turn left 90 degrees
+			if(currentCell.wall[leftCell].present == false)	{
+				currentCell = currentCell.neigh[leftCell];
+				path.add(currentCell);
+				steps++;
+				currentDirection = leftCell;
+			}
+			//Go forward if there is left wall
+			else if(currentCell.wall[currentDirection].present == false) {
+				currentCell = currentCell.neigh[currentDirection];
+				path.add(currentCell);
+				steps++;	
+			}
+			//Turn right 90 degrees if walls in front and left
+			else {
+				rightCell = getRightTurn(currentDirection);
+				currentDirection = rightCell;
+			}
+			
+		}
+		
+		map.drawFtPrt(currentCell);
+	}
+	
+	private int getLeftTurn(int cellDir) {
+		
+		switch(cellDir)	{
+			case Maze.NORTH:
+				cellDir = Maze.WEST;
+				break;
+			case Maze.EAST:
+				cellDir = Maze.NORTH;
+				break;
+			case Maze.SOUTH:
+				cellDir = Maze.EAST;
+				break;
+			case Maze.WEST:
+				cellDir = Maze.SOUTH;
+				break;
+		}
+		
+		return cellDir;
+	}
+	
+	private int getRightTurn(int cellDir) {
+		
+		switch(cellDir)	{
+			case Maze.NORTH:
+				cellDir = Maze.EAST;
+				break;
+			case Maze.EAST:
+				cellDir = Maze.SOUTH;
+				break;
+			case Maze.SOUTH:
+				cellDir = Maze.WEST;
+				break;
+			case Maze.WEST:
+				cellDir = Maze.NORTH;
+				break;
+		}
+		
+		return cellDir;
+	}
     
 	@Override
 	public boolean isSolved() {
 		// If the path is empty, then we didn't solve the maze.
+		
 		if(path.isEmpty() == true){
 			return false;
 		}
