@@ -13,7 +13,8 @@ import maze.Maze;
 /**
  * Uses Recursive Backtracking to generate a maze from a map.
  * 
- * @author Danny Ho
+ * @author Danny Ho			s3603075
+ * @author Caleb Turner		s3604744
  */
 
 
@@ -38,6 +39,9 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 	 * Perform a recursive backtrack to create a path between cells in a maze.
 	 * INPUT: Maze maze.
 	 * OUTPUT: None.
+	 * 
+	 * 1. Pick a random starting cell
+	 * 2. Pick the method for the following maze types
 	 * 
 	 * @param maze Input Maze. 
 	 */
@@ -67,7 +71,35 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 		}
 		
 	} // end of generateMaze()
-
+	
+	/**
+	 * Find an unvisited neighbour of the currently selected cell
+	 * 
+	 * **********************************************************************
+	 * ALGORITHM Recursive Backtrack(Maze)
+	 * Perform a recursive backtrack to create a path between cells in a maze.
+	 * INPUT: Cell c, Integer array dirSet.
+	 * OUTPUT: Cell.
+	 * 
+	 * 1. if c.tunnelTo is not null
+	 * 2. 	 set c and c.tunnelTo cells to visited
+	 * 3. 	 return c.tunnelTo to function
+	 * 4. end if
+	 * 5. shuffle direction set
+	 * 6. for each neighbour of c
+	 * 7. 	 if neighbour is in dirSet
+	 * 8:	    set c, neigh to visited
+	 * 9:		dfsStack.push(c)
+	 * 10:		disable wall in dirSet direction
+	 * 11:	 end if 
+	 * 12: end for
+	 * 13: if dfsStack is empty
+	 * 14: 	  return backtrack function
+	 * 15: endif
+	 * @param Cell c, Integer[] dirSet
+	 * @return getUnvisited(Cell c, Integer[] dirSet) when there are unvisited
+	 * neighbours.
+	 */
 	
 	private Cell getUnvisited(Cell c, Integer[] dirSet)	{
 		
@@ -111,6 +143,33 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 		return null;
 		
 	}
+	
+	/**
+	 * Backtrack when all neighbours of a cell have been visited
+	 * 
+	 * **********************************************************************
+	 * ALGORITHM Recursive Backtrack(Maze)
+	 * Perform a recursive backtrack to create a path between cells in a maze.
+	 * INPUT: Cell c, Integer array dirSet.
+	 * OUTPUT: Cell.
+	 * 
+	 * 1. if c.tunnelTo is not null and dfsStack is not empty
+	 * 2. 	 return cell at top of stack to backtrack()
+	 * 3. end if
+	 * 4. for each neighbour of c
+	 * 5. 	 if neighbour is in dirSet
+	 * 6:	    return unvisited cell to getUnvisited()
+	 * 7:	 end if 
+	 * 8: end for
+	 * 9: if dfsStack is not empty
+	 * 10: 	 return cell at top of stack to backtrack()
+	 * 11:end if
+	 * 
+	 * @param Cell c, Integer[] dirSet
+	 * @return getBacktrack(Cell c, Integer[] dirSet) when there are no neighbours.
+	 * @return getUnvisited(Cell c, Integer[] dirSet) when there are unvisited
+	 * neighbours.
+	 */
 	
 	private Cell backtrack(Cell c, Integer[] dirSet) {
 		

@@ -6,22 +6,16 @@ import java.util.concurrent.ThreadLocalRandom;
 import maze.Maze;
 import maze.Cell;
 
+/**
+ * Uses Growing Tree to generate a maze from a map.
+ * 
+ * @author Danny Ho			s3603075
+ * @author Caleb Turner		s3604744
+ */
+
 public class GrowingTreeGenerator implements MazeGenerator {
-	// Growing tree maze generator. As it is very general, here we implement as "usually pick the most recent cell, but occasionally pick a random cell"
 	
-	/*1. Pick a random starting cell and add it to set Z (initially Z is empty, after addition it contains
-		just the starting cell).
-	  2. Using a particular strategy (see below) select a cell b from Z. If cell b has unvisited neighbouring
-		cells, randomly select a neighbour, carve a path to it, and add the selected neighbour to set Z.
-		If b has no unvisited neighbours, remove it from Z.
-	  3. Repeat step 2 until Z is empty.
-	  
-	  Depending on what strategy is used to select a cell from V , we obtain different behaviour. If we
-	  select the newest cell added to V , then this is the same as recursive backtracker. If we randomly select
-	  a cell in V , then this is similar to Prim’s generation approach. Other strategies can be a mixture of
-	  both (have a try!).
-	*/
-	
+	//Random pick ratio threshold
 	double threshold = 0.1;
 	
 	//Array for set of directions (normal and tunnel)
@@ -32,6 +26,31 @@ public class GrowingTreeGenerator implements MazeGenerator {
 	
 	//ArrayList for selecting cell
 	ArrayList<Cell> setZ = new ArrayList<Cell>();
+	
+	/**
+	 * Growing tree algorithm transformation to perfect maze
+	 * 
+	 * *********************************************************************
+	 *  
+	 * ALGORITHM Growing Tree (maze)
+	 * Use Prim's algorithm to generate a perfect maze.
+	 * INPUT: Maze maze.
+	 * OUTPUT: None.
+	 *  
+	 *  // Find a random cell as the starting point.
+	 *  1: Generate random inputs for random starting cell
+	 *  2: switch for maze type
+	 *  3:		case for normal/hex maze
+	 *  4:			add random starting cell to setZ
+	 *  5:			while setZ is not empty
+	 *  6:				perform strategy for set N/X for directions
+	 *  7:			end while
+	 *  
+	 *  ********************************************************************
+	 *  
+	 *  @param maze Input maze.
+	 *  
+	 */
 	
 	@Override
 	public void generateMaze(Maze maze) {
@@ -45,7 +64,9 @@ public class GrowingTreeGenerator implements MazeGenerator {
 			case Maze.NORMAL:
 				//Starting cell for normal
 				startCell = maze.map[randR][randC];
+				//Add initial value to set
 				setZ.add(startCell);
+				//Iterate through strategy until array is empty
 				while(!setZ.isEmpty())	{
 					strategy(dirSetN);
 				}
@@ -61,6 +82,40 @@ public class GrowingTreeGenerator implements MazeGenerator {
 			}
 		
 	}
+	
+	/**
+	 * Select a strategy to perform - either pick from first or random
+	 * 
+	 * *********************************************************************
+	 *  
+	 * ALGORITHM Growing Tree (maze)
+	 * Use Prim's algorithm to generate a perfect maze.
+	 * INPUT: Integer[] dirSet
+	 * OUTPUT: None.
+	 *  
+	 *  1: Generate random number
+	 *  2: if number is <= to threshold
+	 *  3:		get a random element from setZ
+	 *  4: else
+	 *  5: shuffle directions in array
+	 *  6: for elements in direction set
+	 *  7:		pick a valid neighbouring cell
+	 *  8:		if valid
+	 *  9:			set Cell c, neigh to visited
+	 *  10:			disable wall in direction
+	 *  11:			add to setZ
+	 *  12:			return
+	 *  13:		endif
+	 *  14: endfor
+	 *  15: if no valid neighbours
+	 *  16: 	remove from setZ
+	 *  17: endif
+	 *  
+	 *  ********************************************************************
+	 *  
+	 *  @param dirSet[] dirSet for directional set.
+	 *  
+	 */
 	
 	public void strategy(Integer[] dirSet)	{
 		Cell c;
