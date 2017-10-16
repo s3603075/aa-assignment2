@@ -36,7 +36,7 @@ public class ModifiedPrimsGenerator implements MazeGenerator {
 	 * *********************************************************************
 	 *  
 	 * ALGORITHM Prim (maze)
-	 * Use Prim's algorithm to generate a perfect maze.
+	 * Uses Prim's algorithm to generate a perfect maze.
 	 * INPUT: Maze maze.
 	 * OUTPUT: None.
 	 *  
